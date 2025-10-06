@@ -324,3 +324,4 @@ function initBuatPage() {
 }
 
 document.addEventListener('DOMContentLoaded', initBuatPage);
+//

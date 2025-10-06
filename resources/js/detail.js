@@ -78,3 +78,4 @@ function renderDetail() {
 }
 
 document.addEventListener('DOMContentLoaded', renderDetail);
+//
