@@ -5,12 +5,12 @@
     <a class="nav-link" href="/buat">Buat Transaksi</a>
 
     <div class="nav-dropdown">
-      <button class="nav-link dropdown-toggle" data-dd>Produk ▾</button>
-      <div class="dropdown-menu">
-        <a href="#" class="dropdown-item">Service</a>
-        <a href="#" class="dropdown-item">Obat</a>
-      </div>
-    </div>
+  <button class="nav-link dropdown-toggle" data-dd>Produk ▾</button>
+  <div class="dropdown-menu">
+    <a href="/produk/service" class="dropdown-item">Service</a>
+    <a href="/produk/obat" class="dropdown-item">Obat</a>
+  </div>
+</div>
   </div>
 
   <div class="nav-right">

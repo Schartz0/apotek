@@ -55,3 +55,4 @@ document.addEventListener('DOMContentLoaded', markScrollableWraps);
 import './transaksi.js';  // buat halaman /buat
 import './list.js';       // buat halaman /list
 import './detail.js';     // buat halaman /detail
+import './produk.js';     // buat halaman /produk/service & /produk/obat

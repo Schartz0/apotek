@@ -222,9 +222,9 @@ body{margin:0;font:14px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif;color
 .actions{ display:flex; gap:12px; justify-content:flex-end; margin-top:14px; }
 
 /* Buttons */
-.btn-danger{ background:#e24a4a; color:#fff; }
-.btn-danger:hover{ background:#c73a3a; }
-.btn-disabled{ background:#9aa4b2; color:#fff; cursor:not-allowed; }
+.btn-danger{ background:#de5858; color:#971d1d; }
+.btn-danger:hover{ background:#971d1d; color:#fff; }
+.btn-disabled{ background:#cdcdcd; color:#fff; cursor:not-allowed; }
 
 /* Responsive */
 @media (max-width: 992px){
@@ -322,3 +322,45 @@ body{margin:0;font:14px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif;color
   filter: brightness(0.95);
   text-decoration: underline;   /* minta ada hover */
 }
+
+/* Two columns */
+.two-col{ display:grid; grid-template-columns: 1.3fr 0.8fr; gap:24px; }
+.two-col .card{ background:#fff; border:1px solid #eef1f5; border-radius:12px; padding:16px; }
+.form-row{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.form-row label{ font-weight:700; font-size:14px; color:#334155; }
+.input{ height:40px; border:1px solid #e5e7eb; border-radius:8px; padding:0 12px; }
+.input:focus{ outline:none; border-color:#93c5fd; box-shadow:0 0 0 3px rgba(59,130,246,.15); }
+
+/* buttons */
+.btn{ height:40px; padding:0 14px; border-radius:10px; border:0; background:#f3f4f6; font-weight:700; }
+.btn-primary{ background:#16a34a; color:#fff; }
+.btn-primary[disabled], .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+
+/* modal */
+.modal{ position:fixed; inset:0; display:none; }
+.modal.show{ display:block; }
+.modal__overlay{ position:absolute; inset:0; background:rgba(15,23,42,.45); }
+.modal__box{
+  position:relative; width:520px; max-width:calc(100% - 32px);
+  margin:8vh auto; background:#fff; border-radius:14px; padding:18px;
+  box-shadow:0 10px 30px rgba(2,6,23,.2);
+}
+.modal__title{ font-weight:800; margin-bottom:10px; }
+.modal__actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+
+/* responsive */
+@media (max-width: 920px){
+  .two-col{ grid-template-columns:1fr; }
+}
+
+/* Autocomplete */
+.ac-wrap{ position: relative; }
+.ac-list{
+  position: absolute; left:0; right:0; top:100%; margin-top:4px;
+  background:#fff; border:1px solid #e5e7eb; border-radius:10px;
+  max-height: 220px; overflow:auto; box-shadow:0 10px 20px rgba(2,6,23,.08); z-index:30;
+}
+.ac-item{
+  padding:10px 12px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ac-item:hover, .ac-item.active{ background:#f1f5f9; }
