@@ -12,7 +12,7 @@ use App\Http\Controllers\ServiceController;
 */
 
 // Halaman login
-Route::view('/', 'pages.login')->name('login')->middleware('guest');;
+Route::view('/', 'pages.login')->name('login');
 
 // Proses login
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
