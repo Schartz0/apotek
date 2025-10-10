@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Illuminate\Support\Facades\Log;
 
 class VerifyCsrfToken extends Middleware
 {
@@ -28,7 +29,7 @@ class VerifyCsrfToken extends Middleware
             return parent::handle($request, $next);
         } catch (\Illuminate\Session\TokenMismatchException $e) {
             // Log the error for debugging
-            \Log::error('CSRF Token Mismatch', [
+            Log::error('CSRF Token Mismatch', [
                 'url' => $request->url(),
                 'method' => $request->method(),
                 'token_from_request' => $request->input('_token'),
