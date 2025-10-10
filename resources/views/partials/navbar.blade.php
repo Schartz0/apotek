@@ -16,10 +16,15 @@
   <div class="nav-right">
     <div class="nav-dropdown">
       <button class="nav-user" data-dd>
-        <span class="user-name">Admin 1</span> ▾
+        <span class="user-name">{{ auth()->user()->username ?? 'Admin' }}</span> ▾
       </button>
       <div class="dropdown-menu dropdown-right">
-        <a href="/logout" class="dropdown-item">Logout</a>
+        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+          @csrf
+          <button type="submit" class="dropdown-item" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer;">
+            Logout
+          </button>
+        </form>
       </div>
     </div>
   </div>

@@ -12,10 +12,10 @@ use App\Http\Controllers\ServiceController;
 */
 
 // Halaman login
-Route::view('/', 'pages.login')->name('login');
+Route::view('/', 'pages.login')->name('login')->middleware('guest');
 
 // Proses login
-Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+Route::post('/login', [AuthController::class, 'login'])->name('login.process')->middleware('guest');
 
 // Logout (POST biar aman)
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
