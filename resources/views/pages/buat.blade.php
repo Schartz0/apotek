@@ -21,10 +21,24 @@
             <option>— dummy staff —</option>
           </select>
         </div>
-
+        
         <div class="form-row">
           <label>Nama Client</label>
           <input type="text" class="input js-client" placeholder="Masukkan Nama Client">
+        </div>
+
+        <div class="form-row">
+          <label>Jenis Kelamin</label>
+          <select class="input js-gender">
+            <option selected disabled>Pilih Jenis Kelamin</option>
+            <option value="pria">Pria</option>
+            <option value="wanita">Wanita</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Pekerjaan</label>
+          <input type="text" class="input js-pekerjaan" placeholder="Masukkan Pekerjaan">
         </div>
       </div>
     </div>
