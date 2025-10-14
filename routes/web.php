@@ -38,22 +38,15 @@ Route::middleware('auth')->group(function () {
     | CRUD Obat
     |--------------------------------------------------------------------------
     */
-    Route::get('/obat', [ObatController::class, 'index']);
-    Route::post('/obat', [ObatController::class, 'store']);
-    Route::get('/obat/{obat}', [ObatController::class, 'show']);
-    Route::put('/obat/{obat}', [ObatController::class, 'update']);
-    Route::delete('/obat/{obat}', [ObatController::class, 'destroy']);
+    Route::resource('obat', ObatController::class);
+
 
     /*
     |--------------------------------------------------------------------------
     | CRUD Service
     |--------------------------------------------------------------------------
     */
-    Route::get('/service', [ServiceController::class, 'index']);
-    Route::post('/service', [ServiceController::class, 'store']);
-    Route::get('/service/{service}', [ServiceController::class, 'show']);
-    Route::put('/service/{service}', [ServiceController::class, 'update']);
-    Route::delete('/service/{service}', [ServiceController::class, 'destroy']);
+    Route::resource('service', ServiceController::class);
 
     /*
     |--------------------------------------------------------------------------

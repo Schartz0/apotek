@@ -9,7 +9,8 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        return response()->json(Service::all());
+        $services = Service::all();
+        return view('pages.produk_service', compact('services'));
     }
 
     public function store(Request $request)
@@ -19,13 +20,13 @@ class ServiceController extends Controller
             'stok' => 'required|in:Ada,Kosong',
         ]);
 
-        $service = Service::create($request->only('nama', 'stok'));
-        return response()->json($service, 201);
+        Service::create($request->only('nama', 'stok'));
+        return redirect()->route('service.index')->with('success', 'Service berhasil ditambahkan');
     }
 
-    public function show(Service $service)
+    public function edit(Service $service)
     {
-        return response()->json($service);
+        return view('pages.produk_service_edit', compact('service'));
     }
 
     public function update(Request $request, Service $service)
@@ -36,12 +37,12 @@ class ServiceController extends Controller
         ]);
 
         $service->update($request->only('nama', 'stok'));
-        return response()->json($service);
+        return redirect()->route('service.index')->with('success', 'Service berhasil diupdate');
     }
 
     public function destroy(Service $service)
     {
         $service->delete();
-        return response()->json(['message' => 'Service berhasil dihapus']);
+        return redirect()->route('service.index')->with('success', 'Service berhasil dihapus');
     }
 }

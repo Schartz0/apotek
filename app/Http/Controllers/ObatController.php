@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 
 class ObatController extends Controller
 {
+    // Menampilkan daftar obat
     public function index()
     {
-        return response()->json(Obat::all());
+        $obats = Obat::latest()->get();
+        return view('pages.produk_obat', compact('obats'));
     }
 
+    // Menyimpan data baru
     public function store(Request $request)
     {
         $request->validate([
@@ -19,15 +22,17 @@ class ObatController extends Controller
             'stok' => 'required|in:Ada,Kosong',
         ]);
 
-        $obat = Obat::create($request->only('nama', 'stok'));
-        return response()->json($obat, 201);
+        Obat::create($request->only('nama', 'stok'));
+        return redirect()->route('obat.index')->with('success', 'Obat berhasil ditambahkan');
     }
 
-    public function show(Obat $obat)
+    // Form edit
+    public function edit(Obat $obat)
     {
-        return response()->json($obat);
+        return view('pages.produk_obat_edit', compact('obat'));
     }
 
+    // Update data
     public function update(Request $request, Obat $obat)
     {
         $request->validate([
@@ -36,12 +41,13 @@ class ObatController extends Controller
         ]);
 
         $obat->update($request->only('nama', 'stok'));
-        return response()->json($obat);
+        return redirect()->route('obat.index')->with('success', 'Data obat berhasil diubah');
     }
 
+    // Hapus data
     public function destroy(Obat $obat)
     {
         $obat->delete();
-        return response()->json(['message' => 'Obat berhasil dihapus']);
+        return redirect()->route('obat.index')->with('success', 'Obat berhasil dihapus');
     }
 }
