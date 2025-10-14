@@ -5,7 +5,7 @@
 <div class="produk-wrap" data-type="service">
   <section class="draft">
     <h1 class="page-title">Daftar Service</h1>
-    <p class="page-sub">Total: <span class="js-total">0</span> Service</p>
+    <p class="page-sub">Total: {{ $services->count() }} Service</p>
   </section>
 
   <section class="two-col">
@@ -21,8 +21,28 @@
               <th style="width:150px">Action</th>
             </tr>
           </thead>
-          <tbody class="js-tbody">
-            <tr><td colspan="4" class="muted">Belum ada data.</td></tr>
+          <tbody>
+            @forelse($services as $service)
+              <tr>
+                <td>{{ $service->id }}</td>
+                <td>{{ $service->nama }}</td>
+                <td>{{ $service->stok }}</td>
+                <td>
+                  {{-- Tombol Edit --}}
+                  <a href="{{ route('service.edit', $service->id) }}" class="btn btn-sm">Edit</a>
+
+                  {{-- Form Hapus --}}
+                  <form action="{{ route('service.destroy', $service->id) }}" method="POST" style="display:inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-danger"
+                      onclick="return confirm('Yakin ingin menghapus service ini?')">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            @empty
+              <tr><td colspan="4" class="muted">Belum ada data.</td></tr>
+            @endforelse
           </tbody>
         </table>
       </div>
@@ -31,45 +51,24 @@
     {{-- RIGHT: FORM ADD --}}
     <div class="col right">
       <div class="card">
-        <div class="form-row">
-          <label>Nama Service</label>
-          <input type="text" class="input js-name" placeholder="Masukkan Nama Service">
-        </div>
-        <div class="form-row">
-          <label>Stok</label>
-          <select class="input js-stock">
-            <option value="" selected disabled>Stok</option>
-            <option value="Ada">Ada</option>
-            <option value="Kosong">Kosong</option>
-          </select>
-        </div>
-        <button class="btn btn-primary js-add" disabled>Input Produk</button>
+        <form action="{{ route('service.store') }}" method="POST">
+          @csrf
+          <div class="form-row">
+            <label>Nama Service</label>
+            <input type="text" name="nama" class="input" placeholder="Masukkan Nama Service" required>
+          </div>
+          <div class="form-row">
+            <label>Stok</label>
+            <select name="stok" class="input" required>
+              <option value="" selected disabled>Stok</option>
+              <option value="Ada">Ada</option>
+              <option value="Kosong">Kosong</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Input Produk</button>
+        </form>
       </div>
     </div>
   </section>
-
-  {{-- MODAL EDIT --}}
-  <div class="modal" id="modal-edit" aria-hidden="true">
-    <div class="modal__overlay js-close"></div>
-    <div class="modal__box">
-      <h3 class="modal__title"><span class="js-edit-title">Edit</span></h3>
-      <div class="form-row">
-        <label>Nama</label>
-        <input type="text" class="input js-edit-name" placeholder="Ubah Nama">
-      </div>
-      <div class="form-row">
-        <label>Stok</label>
-        <select class="input js-edit-stock">
-          <option value="" disabled>Stok</option>
-          <option value="Ada">Ada</option>
-          <option value="Kosong">Kosong</option>
-        </select>
-      </div>
-      <div class="modal__actions">
-        <button class="btn js-close">Batal</button>
-        <button class="btn btn-primary js-save" disabled>Ubah</button>
-      </div>
-    </div>
-  </div>
 </div>
 @endsection

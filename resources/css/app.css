@@ -77,9 +77,14 @@ body{margin:0;font:14px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif;color
   position:absolute; top:calc(100% + 6px); left:0; min-width:180px;
   background:var(--white); border:1px solid var(--line); border-radius:12px;
   box-shadow:0 16px 34px rgba(0,0,0,.12); padding:6px; display:none;
+  z-index:100;
 }
 .dropdown-right{ left:auto; right:0; }
-.dropdown-item{ display:block; padding:9px 10px; border-radius:8px; color:var(--ink); }
+.dropdown-item{ 
+  display:block; padding:9px 10px; border-radius:8px; color:var(--ink); 
+  text-decoration:none; cursor:pointer; border:none; background:none;
+  width:100%; text-align:left; font-size:inherit; font-family:inherit;
+}
 .dropdown-item:hover{ background:#f5f7fb; }
 .nav-dropdown.open .dropdown-menu{ display:block; }
 
