@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title','Daftar Service')
+@section('title', 'Daftar Service')
 
 @section('content')
 <div class="produk-wrap" data-type="service">
@@ -15,9 +15,11 @@
         <table class="table">
           <thead>
             <tr>
-              <th style="width:80px">ID</th>
+              <th style="width:60px">ID</th>
               <th>Nama Service</th>
-              <th style="width:120px">Stok</th>
+              <th>Durasi</th>
+              <th>Harga</th>
+              <th style="width:100px">Tersedia</th>
               <th style="width:150px">Action</th>
             </tr>
           </thead>
@@ -25,8 +27,16 @@
             @forelse($services as $service)
               <tr>
                 <td>{{ $service->id }}</td>
-                <td>{{ $service->nama }}</td>
-                <td>{{ $service->stok }}</td>
+                <td>{{ $service->name }}</td>
+                <td>{{ $service->duration ?? '-' }}</td>
+                <td>Rp {{ number_format($service->price, 0, ',', '.') }}</td>
+                <td>
+                  @if($service->available)
+                    <span class="badge bg-success">Ya</span>
+                  @else
+                    <span class="badge bg-danger">Tidak</span>
+                  @endif
+                </td>
                 <td>
                   {{-- Tombol Edit --}}
                   <a href="{{ route('service.edit', $service->id) }}" class="btn btn-sm">Edit</a>
@@ -41,7 +51,9 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="4" class="muted">Belum ada data.</td></tr>
+              <tr>
+                <td colspan="6" class="muted">Belum ada data service.</td>
+              </tr>
             @endforelse
           </tbody>
         </table>
@@ -55,17 +67,29 @@
           @csrf
           <div class="form-row">
             <label>Nama Service</label>
-            <input type="text" name="nama" class="input" placeholder="Masukkan Nama Service" required>
+            <input type="text" name="name" class="input" placeholder="Masukkan nama service" required>
           </div>
+
           <div class="form-row">
-            <label>Stok</label>
-            <select name="stok" class="input" required>
-              <option value="" selected disabled>Stok</option>
-              <option value="Ada">Ada</option>
-              <option value="Kosong">Kosong</option>
+            <label>Durasi</label>
+            <input type="text" name="duration" class="input" placeholder="Contoh: 30 menit / 1 jam">
+          </div>
+
+          <div class="form-row">
+            <label>Harga (Rp)</label>
+            <input type="number" name="price" class="input" placeholder="Masukkan harga" required>
+          </div>
+
+          <div class="form-row">
+            <label>Ketersediaan</label>
+            <select name="available" class="input" required>
+              <option value="" disabled selected>Pilih status</option>
+              <option value="1">Tersedia</option>
+              <option value="0">Tidak Tersedia</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary">Input Produk</button>
+
+          <button type="submit" class="btn btn-primary">Tambah Service</button>
         </form>
       </div>
     </div>

@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Staff Kasir',
             'username' => 'staff',
             'password' => Hash::make('staff123'),
-            'role' => 'staff',
+            'role' => 'user',
         ]);
     }
 }

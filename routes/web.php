@@ -2,61 +2,128 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ObatController;
+use App\Http\Controllers\MedController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProductController;
+use App\Models\Transaction;
 
 /*
 |--------------------------------------------------------------------------
-| Route untuk Autentikasi
+| Route: Halaman Login dan Autentikasi
 |--------------------------------------------------------------------------
 */
 
-// Halaman login
+// Halaman login (hanya untuk guest)
 Route::view('/', 'pages.login')->name('login')->middleware('guest');
 
 // Proses login
-Route::post('/login', [AuthController::class, 'login'])->name('login.process')->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.process')
+    ->middleware('guest');
 
-// Logout (POST biar aman)
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 /*
 |--------------------------------------------------------------------------
-| Route yang butuh login (auth)
+| Route: Setelah Login (auth required)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', function () {
-        $user = auth()->user();
-        return view('pages.draft', compact('user'));
-    })->name('draft');
+
+    /*
+    --------------------------------------------------------------------------
+    | Pencarian Produk (Obat dan Service)
+    |--------------------------------------------------------------------------
+    */   
+
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 
     /*
     |--------------------------------------------------------------------------
-    | CRUD Obat
+    | Logout
     |--------------------------------------------------------------------------
     */
-    Route::resource('obat', ObatController::class);
+    
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ganti Password
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/password/update', [UserController::class, 'updatePassword'])->name('password.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Utama
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        return view('pages.draft', compact('user'));
+    })->name('dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD Obat (Meds)
+    |--------------------------------------------------------------------------
+    |
+    | Controller: MedController
+    | Resource: index, create, store, show, edit, update, destroy
+    |
+    */
+    Route::resource('med', MedController::class);
+
 
 
     /*
     |--------------------------------------------------------------------------
     | CRUD Service
     |--------------------------------------------------------------------------
+    |
+    | Controller: ServiceController
+    |
     */
     Route::resource('service', ServiceController::class);
 
+
     /*
     |--------------------------------------------------------------------------
-    | Static Pages
+    | CRUD Transaksi
+    |--------------------------------------------------------------------------
+    |
+    | Controller: TransactionController
+    | Digunakan untuk gabungan antara produk (obat / service)
+    |
+    */
+    Route::resource('transaction', TransactionController::class);
+    Route::post('/transactions/store', [TransactionController::class, 'store'])->name('transactions.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD Staff dan User (hanya admin)
     |--------------------------------------------------------------------------
     */
-    Route::view('/draft', 'pages.draft');
-    Route::view('/buat', 'pages.buat');
-    Route::view('/list', 'pages.list');
-    Route::view('/detail', 'pages.detail');
-    Route::view('/produk/service', 'pages.produk_service');
-    Route::view('/produk/obat', 'pages.produk_obat');
+    Route::middleware('isAdmin')->group(function () {
+        Route::resource('staff', StaffController::class);
+        Route::resource('user', UserController::class); // pastikan ada controller UserController
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Static Pages (Halaman Tampilan)
+    |--------------------------------------------------------------------------
+    */
+    Route::view('/draft', 'pages.draft')->name('draft.page');
+    Route::view('/buat', 'pages.buat')->name('buat.page');
+    Route::view('/list', 'pages.list')->name('list.page');
+    Route::view('/detail', 'pages.detail')->name('detail.page');
+    // Route::view('/produk/service', 'pages.produk_service')->name('produk.service');
+    // Route::view('/produk/obat', 'pages.produk_obat')->name('produk.obat');
+
+
 });
