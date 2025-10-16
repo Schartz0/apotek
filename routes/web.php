@@ -113,6 +113,16 @@ Route::middleware('auth')->group(function () {
         Route::resource('user', UserController::class); // pastikan ada controller UserController
     });
 
+
+    Route::get('/list', [\App\Http\Controllers\TransactionController::class, 'listPage'])
+  ->name('list.page');
+  Route::delete('/transactions/ref/{ref_no}', [TransactionController::class, 'destroyByRef'])
+  ->name('transactions.destroyByRef');
+  Route::get('/detail/{ref_no}', [\App\Http\Controllers\TransactionController::class, 'detailByRef'])
+->name('transactions.detail');
+
+
+
     /*
     |--------------------------------------------------------------------------
     | Static Pages (Halaman Tampilan)
@@ -120,8 +130,6 @@ Route::middleware('auth')->group(function () {
     */
     Route::view('/draft', 'pages.draft')->name('draft.page');
     Route::view('/buat', 'pages.buat')->name('buat.page');
-    Route::view('/list', 'pages.list')->name('list.page');
-    Route::view('/detail', 'pages.detail')->name('detail.page');
     // Route::view('/produk/service', 'pages.produk_service')->name('produk.service');
     // Route::view('/produk/obat', 'pages.produk_obat')->name('produk.obat');
 

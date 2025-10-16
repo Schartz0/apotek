@@ -21,7 +21,7 @@
           <div class="transaksi-form">
             {{-- Client --}}
             <div class="grid-2">
-              <div class="form-row"><label>Ref No</label><input type="text" class="input ref_no" readonly></div>
+              <div class="form-row"><label>Ref No</label><input type="text" class="input ref_no" placeholder="TX-XXXXXX (auto)" readonly></div>
               <div class="form-row"><label>Created By</label><input type="text" class="input created_by" value="{{ auth()->user()->username ?? 'Admin' }}" readonly></div>
             </div>
             <div class="grid-2">
@@ -48,7 +48,7 @@
                 <div class="form-row"><label>Qty</label><input type="number" class="input qty" min="1" value="1"></div>
               </div>
               <div class="grid-2">
-                <div class="form-row"><label>Price (Rp)</label><input type="number" class="input price" min="0" placeholder="Otomatis"></div>
+                <div class="form-row"><label>Price (Rp)</label><input type="number" class="input price" min="0" placeholder="Otomatis" readonly></div>
                 <div class="form-row"><label>Scheduled Date</label><input type="date" class="input scheduled_date"></div>
               </div>
               <div class="grid-2">
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   tabs.addEventListener('click', e=>{ if(e.target.classList.contains('tab')) activateTab(e.target); });
 
   function initTabForm(wrapper){
-    wrapper.querySelector('.ref_no').value = 'REF-'+Math.random().toString(36).substring(2,8).toUpperCase();
+    //wrapper.querySelector('.ref_no').value = 'REF-'+Math.random().toString(36).substring(2,8).toUpperCase();
 
     wrapper.querySelector('.staff_nik').addEventListener('change', e=>{
       const opt = e.target.selectedOptions[0];
@@ -180,14 +180,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 
     list.addEventListener('click', e=>{
-      if(e.target.classList.contains('dropdown-option')){
-        input.value = e.target.textContent.split(' - ')[0];
-        wrapper.querySelector('.product_id').value   = e.target.dataset.id;
-        wrapper.querySelector('.product_type').value = e.target.dataset.type;
-        wrapper.querySelector('.price').value        = e.target.dataset.price;
-        list.style.display='none';
-      }
-    });
+  if(e.target.classList.contains('dropdown-option')){
+    const { id, type, price } = e.target.dataset;
+    input.value = e.target.textContent.split(' - ')[0];
+    wrapper.querySelector('.product_id').value   = id;
+    wrapper.querySelector('.product_type').value = type;
+    wrapper.querySelector('.price').value        = price;
+
+    // toggle jadwal sesuai tipe
+    const dateEl = wrapper.querySelector('.scheduled_date');
+    const timeEl = wrapper.querySelector('.scheduled_time');
+    if (type === 'service') {
+      dateEl.removeAttribute('disabled');
+      timeEl.removeAttribute('disabled');
+    } else { // med
+      dateEl.value = '';
+      timeEl.value = '';
+      dateEl.setAttribute('disabled', 'disabled');
+      timeEl.setAttribute('disabled', 'disabled');
+    }
+
+    list.style.display='none';
+  }
+});
+
 
     document.addEventListener('click', e=>{
       if(!container.contains(e.target)) list.style.display='none';
@@ -195,38 +211,79 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
  function tambahKeRingkasan(wrapper){
+const date  = wrapper.querySelector('.scheduled_date').value || '';
+const time  = wrapper.querySelector('.scheduled_time').value || '';
+const staffSelect = wrapper.querySelector('.staff_nik');
+const staffNik = staffSelect.value || '';
+const prodType = (wrapper.querySelector('.product_type').value||'').trim();
+if (!staffNik) {
+  alert('Pilih staff terlebih dahulu.');
+  return;
+}
+if (prodType === 'service') {
+  if (!date || !time) {
+    alert('Service wajib punya tanggal & jam.');
+    return;
+  }
+} else { // med
+  if (date || time) {
+    alert('Produk MED tidak boleh memiliki tanggal/jam.');
+    return;
+  }
+}
+
     const name  = wrapper.querySelector('.product-search').value.trim();
-    const qty   = parseInt(wrapper.querySelector('.qty').value)||0;
-    const price = parseInt(wrapper.querySelector('.price').value)||0;
+const qty   = parseInt(wrapper.querySelector('.qty').value)||0;
+const price = parseFloat(wrapper.querySelector('.price').value)||0;
+const prodId   = parseInt(wrapper.querySelector('.product_id').value)||0;
 
-    const staffSelect = wrapper.querySelector('.staff_nik');
-    const staffNik = staffSelect.value; // ambil NIK
-    const staffName = staffSelect.selectedOptions[0]?.text.split(' (')[0] || '-';
-    const loc = staffSelect.selectedOptions[0]?.dataset.location || '';
-    const date  = wrapper.querySelector('.scheduled_date').value;
-    const time  = wrapper.querySelector('.scheduled_time').value;
-    const sub   = qty*price;
-    if(!name || !price){ alert('Lengkapi produk dan harga'); return; }
 
-    const tbody = document.getElementById('sum-body');
-    if(tbody.querySelector('.muted')) tbody.innerHTML='';
+const staffName = staffSelect.selectedOptions[0]?.text.split(' (')[0] || '-';
+const loc = staffSelect.selectedOptions[0]?.dataset.location || '';
+const sub   = qty*price;
 
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${name}</td>
-      <td>${qty}</td>
-      <td>Rp. ${price.toLocaleString('id-ID')}</td>
-      <td>Rp. ${sub.toLocaleString('id-ID')}</td>
-      <td data-nik="${staffNik}">${staffName}</td>
-      <td>${loc}</td>
-      <td>${loc}</td>
-      <td>${date}</td>
-      <td>${time}</td>
-      <td><button type="button" class="btn-hapus-produk btn btn-sm btn-outline-danger">Hapus</button></td>
-    `;
-    tbody.appendChild(tr);
-    tr.querySelector('.btn-hapus-produk').addEventListener('click', ()=>{ tr.remove(); hitungTotal(); });
-    hitungTotal();
+if(!name || !price || !prodId || !prodType){
+  alert('Lengkapi produk (pilih dari dropdown) dan harga.');
+  return;
+}
+
+const tbody = document.getElementById('sum-body');
+if(tbody.querySelector('.muted')) tbody.innerHTML='';
+
+const tr=document.createElement('tr');
+// simpan id & tipe produk untuk payload kirim
+tr.dataset.productId = String(prodId);
+tr.dataset.productType = prodType;
+
+tr.innerHTML=`
+  <td>${name}</td>
+  <td>${qty}</td>
+  <td>Rp. ${price.toLocaleString('id-ID')}</td>
+  <td>Rp. ${sub.toLocaleString('id-ID')}</td>
+  <td data-nik="${staffNik}">${staffName}</td>
+  <td>${loc}</td>
+  <td>${date}</td>
+  <td>${time}</td>
+  <td><button type="button" class="btn-hapus-produk btn btn-sm btn-outline-danger">Hapus</button></td>
+`;
+tbody.appendChild(tr);
+tr.querySelector('.btn-hapus-produk').addEventListener('click', ()=>{
+  tr.remove();
+  hitungTotal();
+  if(!tbody.children.length){
+    tbody.innerHTML='<tr><td colspan="9" class="muted">Belum ada item.</td></tr>';
+  }
+});
+hitungTotal();
+
+// reset minimal supaya tidak double-add
+wrapper.querySelector('.product-search').value = '';
+wrapper.querySelector('.product_id').value = '';
+wrapper.querySelector('.product_type').value = '';
+wrapper.querySelector('.qty').value = 1;
+// price readonly → kosongkan hanya jika ingin memaksa user pilih dari dropdown lagi
+wrapper.querySelector('.price').value = '';
+
   }
 
   function hitungTotal(){
@@ -264,17 +321,18 @@ document.getElementById('btn-proses').addEventListener('click', async ()=>{
     if(tr.querySelector('.muted')) return; // skip placeholder
     const tds = tr.querySelectorAll('td');
     items.push({
-      product_name: tds[0].textContent.trim(),
-      qty: parseInt(tds[1].textContent.replace(/\D/g,'')) || 1,
-      price: parseFloat(tds[2].textContent.replace(/[^\d]/g,'')) || 0,
-      product_id: 0, // nanti bisa diset otomatis saat search produk
-      product_type: 'service', // bisa disesuaikan
-      scheduled_date: tds[6].textContent.trim() || null,
-      scheduled_time: tds[7].textContent.trim() || null,
-      staff_nik: tds[4].dataset.nik,
-      location: tds[5].textContent.trim(),
-      status: 'NEW'
-    });
+  product_id: parseInt(tr.dataset.productId) || 0,
+  product_name: tds[0].textContent.trim(),
+  product_type: tr.dataset.productType || 'service',
+  qty: parseInt(tds[1].textContent.replace(/\D/g,'')) || 1,
+  price: parseFloat(tds[2].textContent.replace(/[^\d]/g,'')) || 0,
+  staff_nik: tds[4].dataset.nik || '',
+  location: tds[5].textContent.trim(),
+  scheduled_date: tds[6].textContent.trim() || null,
+  scheduled_time: tds[7].textContent.trim() || null,
+  status: 'NEW'
+});
+
   });
 
   if(items.length === 0){

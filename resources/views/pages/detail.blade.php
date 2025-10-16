@@ -5,14 +5,14 @@
 <section class="draft">
   <h1 class="page-title">Detail Transaksi</h1>
   <p class="page-sub">
-    Ringkasan transaksi <span id="det-id">#—</span> •
-    <span id="det-date">—</span> •
-    Client: <strong id="det-client">—</strong> •
-    Created by: <strong id="det-by">Admin 1</strong>
+    Ringkasan transaksi <span id="det-id">#{{ $header->ref_no }}</span> •
+    <span id="det-date">{{ \Carbon\Carbon::parse($header->created_at)->format('d M Y H:i') }}</span> •
+    Client: <strong id="det-client">{{ $header->client_name }}</strong> •
+    Created by: <strong id="det-by">{{ $header->created_by }}</strong>
   </p>
 </section>
 
-<section class="summary" id="detail-root" style="display:none;">
+<section class="summary" id="detail-root">
   {{-- Service --}}
   <div class="table-wrap" id="box-service" style="margin-bottom:16px;">
     <div class="table-title">Service</div>
@@ -33,7 +33,23 @@
         </tr>
       </thead>
       <tbody id="tbody-service">
-        <tr><td colspan="11" class="muted">Tidak ada service.</td></tr>
+        @forelse($services as $it)
+          <tr>
+            <td>{{ $it->ref_no }}</td>
+            <td>{{ \Carbon\Carbon::parse($it->created_at)->format('d M Y H:i') }}</td>
+            <td>{{ $it->created_by }}</td>
+            <td>{{ $it->client_name }}</td>
+            <td>{{ $it->product_name }}</td>
+            <td>{{ optional($it->scheduled_date)->format('Y-m-d') }}</td>
+            <td>{{ $it->scheduled_time }}</td>
+            <td>{{ $it->duration }}</td>
+            <td>{{ $it->staff?->name ?? $it->staff_nik }}</td>
+            <td class="tar">Rp {{ number_format($it->price,0,',','.') }}</td>
+            <td>{{ $it->status }}</td>
+          </tr>
+        @empty
+          <tr><td colspan="11" class="muted">Tidak ada service.</td></tr>
+        @endforelse
       </tbody>
     </table>
   </div>
@@ -50,23 +66,36 @@
           <th>Obat</th>
           <th>Quantity</th>
           <th class="tar">Price</th>
+          <th class="tar">Subtotal</th>
         </tr>
       </thead>
       <tbody id="tbody-obat">
-        <tr><td colspan="6" class="muted">Tidak ada obat.</td></tr>
+        @forelse($meds as $it)
+          <tr>
+            <td>{{ \Carbon\Carbon::parse($it->created_at)->format('d M Y H:i') }}</td>
+            <td>{{ $it->created_by }}</td>
+            <td>{{ $it->client_name }}</td>
+            <td>{{ $it->product_name }}</td>
+            <td>{{ $it->qty }}</td>
+            <td class="tar">Rp {{ number_format($it->price,0,',','.') }}</td>
+            <td class="tar">Rp {{ number_format($it->qty * $it->price,0,',','.') }}</td>
+          </tr>
+        @empty
+          <tr><td colspan="7" class="muted">Tidak ada obat.</td></tr>
+        @endforelse
       </tbody>
     </table>
   </div>
 
-  <div class="actions">
-    <a href="/list" class="btn">Kembali</a>
+  <div class="actions" style="display:flex; align-items:center; gap:12px; margin-top:12px;">
+    <a href="{{ route('list.page') }}" class="btn">Kembali</a>
     <div style="flex:1"></div>
-    <div class="strong">Total : <span id="det-total">Rp. 0</span></div>
+    <div class="strong">Total : <span id="det-total">Rp {{ number_format($total,0,',','.') }}</span></div>
   </div>
 </section>
 
-<section id="notfound" class="draft" style="display:none;">
-  <p class="muted">Transaksi tidak ditemukan.</p>
-  <a href="/list" class="btn">Kembali ke List</a>
-</section>
+<style>
+  .tar{text-align:right}
+  .muted{color:#888}
+</style>
 @endsection
