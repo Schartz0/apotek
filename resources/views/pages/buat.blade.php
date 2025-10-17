@@ -17,20 +17,43 @@
       </div>
 
       <div id="tab-contents">
+        {{-- TEMPLATE TAB #1 --}}
         <div class="tab-content active" data-tab="1">
           <div class="transaksi-form">
             {{-- Client --}}
             <div class="grid-2">
-              <div class="form-row"><label>Ref No</label><input type="text" class="input ref_no" placeholder="TX-XXXXXX (auto)" readonly></div>
-              <div class="form-row"><label>Created By</label><input type="text" class="input created_by" value="{{ auth()->user()->username ?? 'Admin' }}" readonly></div>
+              <div class="form-row">
+                <label>Ref No</label>
+                <input type="text" class="input ref_no" placeholder="TX-XXXXXX (auto)" readonly>
+              </div>
+              <div class="form-row">
+                <label>Created By</label>
+                <input type="text" class="input created_by" value="{{ auth()->user()->username ?? 'Admin' }}" readonly>
+              </div>
             </div>
             <div class="grid-2">
-              <div class="form-row"><label>Nama Client</label><input type="text" class="input client_name" placeholder="Nama client"></div>
-              <div class="form-row"><label>Jenis Kelamin</label><select class="input sex"><option value="">Pilih</option><option value="M">Pria</option><option value="F">Wanita</option></select></div>
+              <div class="form-row">
+                <label>Nama Client</label>
+                <input type="text" class="input client_name" placeholder="Nama client">
+              </div>
+              <div class="form-row">
+                <label>Jenis Kelamin</label>
+                <select class="input sex">
+                  <option value="">Pilih</option>
+                  <option value="M">Pria</option>
+                  <option value="F">Wanita</option>
+                </select>
+              </div>
             </div>
             <div class="grid-2">
-              <div class="form-row"><label>Usia</label><input type="number" class="input age" min="0" max="120" placeholder="Usia"></div>
-              <div class="form-row"><label>Pekerjaan</label><input type="text" class="input occupation" placeholder="Pekerjaan"></div>
+              <div class="form-row">
+                <label>Usia</label>
+                <input type="number" class="input age" min="0" max="120" placeholder="Usia">
+              </div>
+              <div class="form-row">
+                <label>Pekerjaan</label>
+                <input type="text" class="input occupation" placeholder="Pekerjaan">
+              </div>
             </div>
 
             <hr>
@@ -45,22 +68,82 @@
                   <input type="hidden" class="product_id">
                   <input type="hidden" class="product_type">
                 </div>
-                <div class="form-row"><label>Qty</label><input type="number" class="input qty" min="1" value="1"></div>
+                <div class="form-row">
+                  <label>Qty</label>
+                  <input type="number" class="input qty" min="1" value="1">
+                </div>
               </div>
               <div class="grid-2">
-                <div class="form-row"><label>Price (Rp)</label><input type="number" class="input price" min="0" placeholder="Otomatis" readonly></div>
-                <div class="form-row"><label>Scheduled Date</label><input type="date" class="input scheduled_date"></div>
+                <div class="form-row">
+                  <label>Price (Rp)</label>
+                  <input type="number" class="input price" min="0" placeholder="Otomatis" readonly>
+                </div>
+                <div class="form-row">
+                  <label>Scheduled Date</label>
+                  <input type="date" class="input scheduled_date">
+                </div>
               </div>
               <div class="grid-2">
-                <div class="form-row"><label>Scheduled Time</label><input type="time" class="input scheduled_time"></div>
-                <div class="form-row"><label>Staff NIK</label><select class="input staff_nik"><option selected disabled>Pilih Staff</option>@foreach(\App\Models\Staff::all() as $s)<option value="{{ $s->nik }}" data-location="{{ $s->location }}">{{ $s->name }} ({{ $s->location }})</option>@endforeach</select></div>
+                <div class="form-row">
+                  <label>Scheduled Time</label>
+                  <input type="time" class="input scheduled_time">
+                </div>
+                <div class="form-row">
+                  <label>Staff NIK</label>
+                  <select class="input staff_nik">
+                    <option selected disabled>Pilih Staff</option>
+                    @foreach(\App\Models\Staff::all() as $s)
+                      <option value="{{ $s->nik }}" data-location="{{ $s->location }}">{{ $s->name }} ({{ $s->location }})</option>
+                    @endforeach
+                  </select>
+                </div>
               </div>
               <div class="grid-2">
-                <div class="form-row"><label>Location</label><input type="text" class="input location" placeholder="Otomatis" readonly></div>
-                <div class="form-row"><label>Status</label><select class="input status"><option value="NEW">NEW</option><option value="COMPLETED">COMPLETED</option></select></div>
+                <div class="form-row">
+                  <label>Location</label>
+                  <input type="text" class="input location" placeholder="Otomatis" readonly>
+                </div>
+                <div class="form-row">
+                  <label>Status</label>
+                  <select class="input status">
+                    <option value="NEW">NEW</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                  </select>
+                </div>
               </div>
               <button type="button" class="btn btn-sm btn-primary btn-tambah-ke-ringkasan">Tambah ke Ringkasan</button>
             </div>
+
+            {{-- RINGKASAN PER TAB --}}
+            <section class="summary mt-3">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Produk</th>
+                      <th>Qty</th>
+                      <th>Harga</th>
+                      <th>Subtotal</th>
+                      <th>Staff</th>
+                      <th>Lokasi</th>
+                      <th>Tanggal</th>
+                      <th>Jam</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody class="sum-body">
+                    <tr><td colspan="9" class="muted">Belum ada item.</td></tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3" class="tar strong">Total :</td>
+                      <td class="tar strong sum-total">Rp. 0</td>
+                      <td colspan="5"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </section>
 
           </div>
         </div>
@@ -69,70 +152,61 @@
 
     {{-- ¼: REKOMENDASI --}}
     @include('partials.rekomendasi')
+  </div>
 </section>
 
-{{-- Ringkasan --}}
-<section class="summary">
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Produk</th>
-          <th>Qty</th>
-          <th>Harga</th>
-          <th>Subtotal</th>
-          <th>Staff</th>
-          <th>Lokasi</th>
-          <th>Tanggal</th>
-          <th>Jam</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="sum-body">
-        <tr><td colspan="9" class="muted">Belum ada item.</td></tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3" class="tar strong">Total :</td>
-          <td class="tar strong" id="sum-total">Rp. 0</td>
-          <td colspan="5"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-  <div class="actions">
-    <a href="{{ route('draft.page') }}" class="btn btn-danger">Batalkan</a>
-    <button class="btn btn-primary" id="btn-proses">Proses Transaksi</button>
-  </div>
-</section>
+<div class="actions" style="margin-top:18px;">
+  <a href="{{ route('draft.page') }}" class="btn btn-danger">Batalkan</a>
+  <button class="btn btn-primary" id="btn-proses">Proses Transaksi</button>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
   let tabCount = 1;
-  const tabs   = document.getElementById('tab-container');
+  const tabs     = document.getElementById('tab-container');
   const contents = document.getElementById('tab-contents');
   const btnAdd   = document.getElementById('btn-add-tab');
   const btnRem   = document.getElementById('btn-remove-tab');
 
-  function activateTab(tab){
+  function activateTab(tabBtn){
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelector(`.tab-content[data-tab="${tab.dataset.tab}"]`).classList.add('active');
+    tabBtn.classList.add('active');
+    document.querySelector(`.tab-content[data-tab="${tabBtn.dataset.tab}"]`).classList.add('active');
   }
 
   btnAdd.addEventListener('click', ()=>{
     tabCount++;
     const newTab = document.createElement('button');
-    newTab.className = 'tab'; newTab.dataset.tab = tabCount;
-    newTab.textContent = 'Transaksi '+tabCount;
+    newTab.className = 'tab';
+    newTab.dataset.tab = tabCount;
+    newTab.textContent = 'Transaksi ' + tabCount;
 
     const newContent = document.createElement('div');
-    newContent.className = 'tab-content'; newContent.dataset.tab = tabCount;
+    newContent.className = 'tab-content';
+    newContent.dataset.tab = tabCount;
+    // clone isi tab #1
     newContent.innerHTML = document.querySelector('.tab-content[data-tab="1"]').innerHTML;
 
-    tabs.appendChild(newTab); contents.appendChild(newContent);
-    activateTab(newTab); initTabForm(newContent);
+    tabs.appendChild(newTab);
+    contents.appendChild(newContent);
+
+    // bersihkan ringkasan & input produk di tab baru
+    const tbody = newContent.querySelector('.sum-body');
+    tbody.innerHTML = '<tr><td colspan="9" class="muted">Belum ada item.</td></tr>';
+    newContent.querySelector('.product-search').value = '';
+    newContent.querySelector('.product_id').value = '';
+    newContent.querySelector('.product_type').value = '';
+    newContent.querySelector('.qty').value = 1;
+    newContent.querySelector('.price').value = '';
+    newContent.querySelector('.scheduled_date').value = '';
+    newContent.querySelector('.scheduled_time').value = '';
+    newContent.querySelector('.staff_nik').selectedIndex = 0;
+    newContent.querySelector('.location').value = '';
+    newContent.querySelector('.sum-total').textContent = 'Rp. 0';
+
+    activateTab(newTab);
+    initTabForm(newContent);
   });
 
   btnRem.addEventListener('click', ()=>{
@@ -140,22 +214,34 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!active) return;
     const id = active.dataset.tab;
     const content = document.querySelector(`.tab-content[data-tab="${id}"]`);
-    if(tabs.children.length>1){ active.remove(); content.remove(); activateTab(tabs.lastElementChild); }
-    else alert('Minimal harus ada satu tab transaksi!');
+    if(tabs.children.length > 1){
+      active.remove();
+      content.remove();
+      activateTab(tabs.lastElementChild);
+    }else{
+      alert('Minimal harus ada satu tab transaksi!');
+    }
   });
 
-  tabs.addEventListener('click', e=>{ if(e.target.classList.contains('tab')) activateTab(e.target); });
+  tabs.addEventListener('click', (e)=>{
+    if(e.target.classList.contains('tab')) activateTab(e.target);
+  });
 
   function initTabForm(wrapper){
-    //wrapper.querySelector('.ref_no').value = 'REF-'+Math.random().toString(36).substring(2,8).toUpperCase();
-
-    wrapper.querySelector('.staff_nik').addEventListener('change', e=>{
+    // lokasi auto dari staff
+    const staffSelect = wrapper.querySelector('.staff_nik');
+    staffSelect.addEventListener('change', e=>{
       const opt = e.target.selectedOptions[0];
-      wrapper.querySelector('.location').value = opt.dataset.location||'';
+      wrapper.querySelector('.location').value = opt?.dataset.location || '';
     });
 
     attachProductSearch(wrapper);
-    wrapper.querySelector('.btn-tambah-ke-ringkasan').addEventListener('click', ()=> tambahKeRingkasan(wrapper));
+
+    // pastikan tidak dobel listener
+    const oldBtn = wrapper.querySelector('.btn-tambah-ke-ringkasan');
+    const newBtn = oldBtn.cloneNode(true);
+    oldBtn.replaceWith(newBtn);
+    newBtn.addEventListener('click', ()=> tambahKeRingkasan(wrapper));
   }
 
   function attachProductSearch(wrapper){
@@ -163,210 +249,231 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const container = wrapper.querySelector('.product-container');
     const list   = wrapper.querySelector('.dropdown-list');
 
-    input.addEventListener('input', async e=>{
-      const q = input.value.trim(); if(q.length<2){list.style.display='none'; return;}
+    // reset dropdown
+    list.innerHTML=''; list.style.display='none';
+
+    input.addEventListener('input', async ()=>{
+      const q = input.value.trim(); if(q.length < 2){ list.style.display='none'; return; }
       try{
-        const res = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`{{ route('products.search') }}?q=${encodeURIComponent(q)}`);
         const data = await res.json();
-        list.innerHTML='';
+        list.innerHTML = '';
         data.forEach(p=>{
-          const opt=document.createElement('div'); opt.className='dropdown-option';
-          opt.textContent=`${p.name} - Rp${p.price}`;
-          opt.dataset.id=p.id; opt.dataset.type=p.type; opt.dataset.price=p.price;
+          const opt = document.createElement('div');
+          opt.className = 'dropdown-option';
+          opt.textContent = `${p.name} - Rp${Number(p.price).toLocaleString('id-ID')}`;
+          opt.dataset.id = p.id;
+          opt.dataset.type = p.type;   // 'service' | 'med'
+          opt.dataset.price = p.price;
           list.appendChild(opt);
         });
-        list.style.display=data.length?'block':'none';
-      }catch(err){console.error(err);}
+        list.style.display = data.length ? 'block' : 'none';
+      }catch(err){ console.error(err); }
     });
 
     list.addEventListener('click', e=>{
-  if(e.target.classList.contains('dropdown-option')){
-    const { id, type, price } = e.target.dataset;
-    input.value = e.target.textContent.split(' - ')[0];
-    wrapper.querySelector('.product_id').value   = id;
-    wrapper.querySelector('.product_type').value = type;
-    wrapper.querySelector('.price').value        = price;
+      if(!e.target.classList.contains('dropdown-option')) return;
 
-    // toggle jadwal sesuai tipe
-    const dateEl = wrapper.querySelector('.scheduled_date');
-    const timeEl = wrapper.querySelector('.scheduled_time');
-    if (type === 'service') {
-      dateEl.removeAttribute('disabled');
-      timeEl.removeAttribute('disabled');
-    } else { // med
-      dateEl.value = '';
-      timeEl.value = '';
-      dateEl.setAttribute('disabled', 'disabled');
-      timeEl.setAttribute('disabled', 'disabled');
-    }
+      const { id, type, price } = e.target.dataset;
+      input.value = e.target.textContent.split(' - ')[0];
+      wrapper.querySelector('.product_id').value   = id;
+      wrapper.querySelector('.product_type').value = type;
+      wrapper.querySelector('.price').value        = price;
 
-    list.style.display='none';
-  }
-});
+      // toggle jadwal sesuai tipe
+      const dateEl = wrapper.querySelector('.scheduled_date');
+      const timeEl = wrapper.querySelector('.scheduled_time');
+      if (type === 'service') {
+        dateEl.removeAttribute('disabled');
+        timeEl.removeAttribute('disabled');
+      } else { // med
+        dateEl.value = '';
+        timeEl.value = '';
+        dateEl.setAttribute('disabled', 'disabled');
+        timeEl.setAttribute('disabled', 'disabled');
+      }
+      list.style.display = 'none';
+    });
 
-
-    document.addEventListener('click', e=>{
+    document.addEventListener('click', (e)=>{
       if(!container.contains(e.target)) list.style.display='none';
     });
   }
 
- function tambahKeRingkasan(wrapper){
-const date  = wrapper.querySelector('.scheduled_date').value || '';
-const time  = wrapper.querySelector('.scheduled_time').value || '';
-const staffSelect = wrapper.querySelector('.staff_nik');
-const staffNik = staffSelect.value || '';
-const prodType = (wrapper.querySelector('.product_type').value||'').trim();
-if (!staffNik) {
-  alert('Pilih staff terlebih dahulu.');
-  return;
-}
-if (prodType === 'service') {
-  if (!date || !time) {
-    alert('Service wajib punya tanggal & jam.');
-    return;
-  }
-} else { // med
-  if (date || time) {
-    alert('Produk MED tidak boleh memiliki tanggal/jam.');
-    return;
-  }
-}
+  function tambahKeRingkasan(wrapper){
+    // ambil nilai awal
+    const nameEl   = wrapper.querySelector('.product-search');
+    const qtyEl    = wrapper.querySelector('.qty');
+    const priceEl  = wrapper.querySelector('.price');
+    const idEl     = wrapper.querySelector('.product_id');
+    const typeEl   = wrapper.querySelector('.product_type');
+    const dateEl   = wrapper.querySelector('.scheduled_date');
+    const timeEl   = wrapper.querySelector('.scheduled_time');
+    const staffSel = wrapper.querySelector('.staff_nik');
 
-    const name  = wrapper.querySelector('.product-search').value.trim();
-const qty   = parseInt(wrapper.querySelector('.qty').value)||0;
-const price = parseFloat(wrapper.querySelector('.price').value)||0;
-const prodId   = parseInt(wrapper.querySelector('.product_id').value)||0;
+    const name        = (nameEl?.value || '').trim();
+    const qty         = parseInt(qtyEl?.value || '0', 10) || 0;
+    const price       = parseFloat(priceEl?.value || '0') || 0;
+    const prodId      = parseInt(idEl?.value || '0', 10) || 0;
+    const prodTypeVal = (typeEl?.value || '').trim();
+    const dateVal     = (dateEl?.value || '').trim();
+    const timeVal     = (timeEl?.value || '').trim();
 
+    const staffNik    = staffSel?.value || '';
+    const staffName   = staffSel?.selectedOptions?.[0]?.text.split(' (')[0] || '-';
+    const loc         = staffSel?.selectedOptions?.[0]?.dataset.location || '';
 
-const staffName = staffSelect.selectedOptions[0]?.text.split(' (')[0] || '-';
-const loc = staffSelect.selectedOptions[0]?.dataset.location || '';
-const sub   = qty*price;
+    // Validasi FE
+    if (!name || !price || !prodId || !prodTypeVal){
+      alert('Lengkapi produk (pilih dari dropdown) dan harga.');
+      return;
+    }
+    if (!staffNik){
+      alert('Pilih staff terlebih dahulu.');
+      return;
+    }
+    if (prodTypeVal === 'service'){
+      if (!dateVal || !timeVal){
+        alert('Service wajib punya tanggal & jam.');
+        return;
+      }
+    } else { // med
+      if (dateVal || timeVal){
+        alert('Produk MED tidak boleh memiliki tanggal/jam.');
+        return;
+      }
+    }
 
-if(!name || !price || !prodId || !prodType){
-  alert('Lengkapi produk (pilih dari dropdown) dan harga.');
-  return;
-}
+    const sub = qty * price;
 
-const tbody = document.getElementById('sum-body');
-if(tbody.querySelector('.muted')) tbody.innerHTML='';
+    const tbody = wrapper.querySelector('.sum-body');
+    if (tbody.querySelector('.muted')) tbody.innerHTML = '';
 
-const tr=document.createElement('tr');
-// simpan id & tipe produk untuk payload kirim
-tr.dataset.productId = String(prodId);
-tr.dataset.productType = prodType;
+    const tr = document.createElement('tr');
+    tr.dataset.productId   = String(prodId);
+    tr.dataset.productType = prodTypeVal;
 
-tr.innerHTML=`
-  <td>${name}</td>
-  <td>${qty}</td>
-  <td>Rp. ${price.toLocaleString('id-ID')}</td>
-  <td>Rp. ${sub.toLocaleString('id-ID')}</td>
-  <td data-nik="${staffNik}">${staffName}</td>
-  <td>${loc}</td>
-  <td>${date}</td>
-  <td>${time}</td>
-  <td><button type="button" class="btn-hapus-produk btn btn-sm btn-outline-danger">Hapus</button></td>
-`;
-tbody.appendChild(tr);
-tr.querySelector('.btn-hapus-produk').addEventListener('click', ()=>{
-  tr.remove();
-  hitungTotal();
-  if(!tbody.children.length){
-    tbody.innerHTML='<tr><td colspan="9" class="muted">Belum ada item.</td></tr>';
-  }
-});
-hitungTotal();
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${qty}</td>
+      <td>Rp. ${price.toLocaleString('id-ID')}</td>
+      <td>Rp. ${sub.toLocaleString('id-ID')}</td>
+      <td data-nik="${staffNik}">${staffName}</td>
+      <td>${loc}</td>
+      <td>${dateVal}</td>
+      <td>${timeVal}</td>
+      <td><button type="button" class="btn-hapus-produk btn btn-sm btn-outline-danger">Hapus</button></td>
+    `;
+    tbody.appendChild(tr);
 
-// reset minimal supaya tidak double-add
-wrapper.querySelector('.product-search').value = '';
-wrapper.querySelector('.product_id').value = '';
-wrapper.querySelector('.product_type').value = '';
-wrapper.querySelector('.qty').value = 1;
-// price readonly → kosongkan hanya jika ingin memaksa user pilih dari dropdown lagi
-wrapper.querySelector('.price').value = '';
-
-  }
-
-  function hitungTotal(){
-    let tot=0;
-    document.querySelectorAll('#sum-body tr').forEach(tr=>{
-      const sub = parseInt(tr.cells[3].textContent.replace(/[^\d]/g,''))||0;
-      tot+=sub;
+    tr.querySelector('.btn-hapus-produk').addEventListener('click', ()=>{
+      tr.remove();
+      hitungTotal(wrapper);
+      if(!tbody.children.length){
+        tbody.innerHTML = '<tr><td colspan="9" class="muted">Belum ada item.</td></tr>';
+      }
     });
-    document.getElementById('sum-total').textContent='Rp. '+tot.toLocaleString('id-ID');
+
+    hitungTotal(wrapper);
+
+    // reset minimal
+    nameEl.value  = '';
+    idEl.value    = '';
+    typeEl.value  = '';
+    qtyEl.value   = 1;
+    priceEl.value = '';
+    // date/time tetap mengikuti toggle produk berikutnya
   }
 
+  function hitungTotal(wrapper){
+    let tot = 0;
+    wrapper.querySelectorAll('.sum-body tr').forEach(tr=>{
+      const subText = tr.cells[3]?.textContent || '';
+      const sub = parseInt(subText.replace(/[^\d]/g,'')) || 0;
+      tot += sub;
+    });
+    wrapper.querySelector('.sum-total').textContent = 'Rp. ' + tot.toLocaleString('id-ID');
+  }
+
+  // init tab pertama
   initTabForm(document.querySelector('.tab-content.active'));
 });
 
-// =============== PROSES TRANSAKSI ===================
+// =============== PROSES TRANSAKSI (MULTI CLIENT) ===================
 document.getElementById('btn-proses').addEventListener('click', async ()=>{
+  const allTabs = document.querySelectorAll('.tab-content');
+  const allClients = [];
 
-  // Ambil data client dari tab pertama (anggap satu klien per transaksi)
-  const firstTab = document.querySelector('.tab-content[data-tab="1"]');
-  const clientData = {
-    client_name: firstTab.querySelector('.client_name').value.trim(),
-    age: firstTab.querySelector('.age').value || null,
-    occupation: firstTab.querySelector('.occupation').value.trim(),
-    sex: firstTab.querySelector('.sex').value || null,
-  };
+  allTabs.forEach(tab=>{
+    const clientData = {
+      client_name: tab.querySelector('.client_name').value.trim(),
+      age: tab.querySelector('.age').value || null,
+      occupation: tab.querySelector('.occupation').value.trim(),
+      sex: tab.querySelector('.sex').value || null,
+      channel: 'Point Of Sale'
+    };
 
-  if(!clientData.client_name){
-    alert('Nama client wajib diisi!');
-    return;
-  }
-
-  // Ambil semua item dari ringkasan
-  const items = [];
-  document.querySelectorAll('#sum-body tr').forEach(tr=>{
-    if(tr.querySelector('.muted')) return; // skip placeholder
-    const tds = tr.querySelectorAll('td');
-    items.push({
-  product_id: parseInt(tr.dataset.productId) || 0,
-  product_name: tds[0].textContent.trim(),
-  product_type: tr.dataset.productType || 'service',
-  qty: parseInt(tds[1].textContent.replace(/\D/g,'')) || 1,
-  price: parseFloat(tds[2].textContent.replace(/[^\d]/g,'')) || 0,
-  staff_nik: tds[4].dataset.nik || '',
-  location: tds[5].textContent.trim(),
-  scheduled_date: tds[6].textContent.trim() || null,
-  scheduled_time: tds[7].textContent.trim() || null,
-  status: 'NEW'
-});
-
-  });
-
-  if(items.length === 0){
-    alert('Belum ada produk di ringkasan.');
-    return;
-  }
-
-  // Kirim ke backend
-  try{
-    const res = await fetch("{{ route('transactions.store') }}", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      },
-      body: JSON.stringify({
-        ...clientData,
-        items
-      })
+    const items = [];
+    tab.querySelectorAll('.sum-body tr').forEach(tr=>{
+      if(tr.querySelector('.muted')) return;
+      const tds = tr.querySelectorAll('td');
+      items.push({
+        product_id: parseInt(tr.dataset.productId) || 0,
+        product_name: tds[0].textContent.trim(),
+        product_type: tr.dataset.productType || 'service',
+        qty: parseInt(tds[1].textContent.replace(/\D/g,'')) || 1,
+        price: parseFloat(tds[2].textContent.replace(/[^\d]/g,'')) || 0,
+        staff_nik: tds[4].dataset.nik || '',
+        location: tds[5].textContent.trim(),
+        scheduled_date: tds[6].textContent.trim() || null,
+        scheduled_time: tds[7].textContent.trim() || null,
+        status: 'NEW'
+      });
     });
 
-    const data = await res.json();
-    if(data.success){
-      alert('Transaksi berhasil disimpan! Ref: '+data.ref_no);
-      window.location.href = "{{ route('draft.page') }}";
-    }else{
-      alert('Gagal menyimpan transaksi.');
+    if(clientData.client_name && items.length > 0){
+      allClients.push({ ...clientData, items });
     }
-  }catch(err){
-    console.error(err);
-    alert('Terjadi kesalahan server.');
-  }
-});
+  });
 
+  if(allClients.length === 0){
+    alert('Belum ada transaksi yang valid.');
+    return;
+  }
+
+  // kirim ke backend satu per satu
+  for(const c of allClients){
+    try{
+      const res = await fetch("{{ route('transactions.store') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(c)
+      });
+      const data = await res.json();
+
+      if(res.status === 422){
+        const msgs = Object.values(data.errors || {}).flat().join('\n');
+        alert('Validasi gagal pada salah satu tab:\n' + msgs);
+        return;
+      }
+
+      if(!data.success){
+        alert('Gagal menyimpan salah satu transaksi.');
+        return;
+      }
+    }catch(err){
+      console.error(err);
+      alert('Terjadi kesalahan server.');
+      return;
+    }
+  }
+
+  alert('Semua transaksi berhasil disimpan!');
+  window.location.href = "{{ route('list.page') }}";
+});
 </script>
 
 <style>
@@ -378,20 +485,23 @@ document.getElementById('btn-proses').addEventListener('click', async ()=>{
 
 /* Tab */
 .tab-bar{display:flex; justify-content:space-between; margin-bottom:15px;}
-.tabs{display:flex; gap:6px;}
+.tabs{display:flex; gap:6px; flex-wrap:wrap;}
 .tab-actions{display:flex; gap:6px;}
 .tab{background:#f3f3f3; border:1px solid #ccc; padding:6px 12px; border-radius:4px; cursor:pointer;}
-.tab.active{background:#007bff; color:white; border-color:#007bff;}
+.tab.active{background:#007bff; color:#fff; border-color:#007bff;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
 /* Produk */
 .product-container{position:relative;}
-.dropdown-list{position:absolute; top:100%; left:0; width:100%; max-height:150px; overflow-y:auto; background:#fff; border:1px solid #ccc; z-index:50; display:none;}
+.dropdown-list{position:absolute; top:100%; left:0; width:100%; max-height:180px; overflow-y:auto; background:#fff; border:1px solid #ccc; z-index:50; display:none; border-radius:4px;}
 .dropdown-option{padding:6px 8px; cursor:pointer;}
 .dropdown-option:hover{background:#e7f1ff;}
 
 /* Summary */
-.summary{margin-top:30px;}
+.summary{margin-top:20px;}
+.table .tar{text-align:right}
+.table .strong{font-weight:600}
+.muted{color:#888}
 </style>
 @endsection
