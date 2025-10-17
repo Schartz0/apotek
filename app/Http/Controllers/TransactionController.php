@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -180,6 +181,42 @@ public function destroyByRef(string $ref_no)
 
     return view('pages.detail', compact('header','services','meds','total'));
 }
+
+
+public function recommend(Request $request)
+{
+    $age = $request->age;
+    $sex = $request->sex;
+    $occupation = $request->occupation;
+
+    // Ambil transaksi lama yang mirip (Cluster by usia, sex, pekerjaan)
+    $query = Transaction::query();
+    if ($age) $query->whereBetween('age', [$age - 5, $age + 5]);
+    if ($sex) $query->where('sex', $sex);
+    if ($occupation) $query->where('occupation', 'like', "%$occupation%");
+
+    $histories = $query->get();
+
+    // Hitung frekuensi produk
+    $produkCounts = [];
+    foreach ($histories as $tx) {
+        $name = $tx->product_name;
+        $produkCounts[$name] = ($produkCounts[$name] ?? 0) + 1;
+    }
+
+    // Sort descending by freq
+    arsort($produkCounts);
+
+    // Ambil 5 besar
+    $recommendations = array_slice(array_keys($produkCounts), 0, 5);
+
+    return response()->json([
+        'recommendations' => $recommendations,
+        'total_matches' => $histories->count()
+    ]);
+}
+
+
 
 }
 
