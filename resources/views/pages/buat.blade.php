@@ -241,7 +241,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const oldBtn = wrapper.querySelector('.btn-tambah-ke-ringkasan');
     const newBtn = oldBtn.cloneNode(true);
     oldBtn.replaceWith(newBtn);
-    newBtn.addEventListener('click', ()=> tambahKeRingkasan(wrapper));
+    newBtn.addEventListener('click', ()=>{
+  tambahKeRingkasan(wrapper);
+  if (typeof window.refreshRekom === 'function') {
+    window.refreshRekom();          // tab hasil clone pun auto refresh
+  }
+});
   }
 
   function attachProductSearch(wrapper){
@@ -373,6 +378,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
         tbody.innerHTML = '<tr><td colspan="9" class="muted">Belum ada item.</td></tr>';
       }
     });
+
+    if (typeof window.refreshRekom === 'function') {
+    window.refreshRekom();          // panggil refresher rekom setiap berhasil tambah
+  }
 
     hitungTotal(wrapper);
 

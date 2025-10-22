@@ -121,7 +121,11 @@ Route::middleware('auth')->group(function () {
   Route::get('/detail/{ref_no}', [\App\Http\Controllers\TransactionController::class, 'detailByRef'])
 ->name('transactions.detail');
 
-   Route::post('/transactions/recommend', [TransactionController::class, 'recommend'])->name('transactions.recommend');
+   Route::post('/transactions/recommend', [TransactionController::class, 'recommend'])
+    ->name('transactions.recommend');
+// (opsional) sekaligus ijinkan GET juga:
+Route::match(['GET','POST'], '/transactions/recommend', [TransactionController::class, 'recommend'])
+    ->name('transactions.recommend');
 
 
 
