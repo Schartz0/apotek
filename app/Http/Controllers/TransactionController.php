@@ -189,7 +189,7 @@ public function recommend(Request $request)
     $sex = $request->sex;
     $occupation = $request->occupation;
 
-    // Ambil transaksi lama yang mirip (Cluster by usia, sex, pekerjaan)
+    // Ambil transaksi lama yang mirip (cluster by usia, sex, pekerjaan)
     $query = Transaction::query();
     if ($age) $query->whereBetween('age', [$age - 5, $age + 5]);
     if ($sex) $query->where('sex', $sex);
@@ -197,24 +197,36 @@ public function recommend(Request $request)
 
     $histories = $query->get();
 
-    // Hitung frekuensi produk
+    // Hitung frekuensi berdasarkan product_id + product_type
     $produkCounts = [];
     foreach ($histories as $tx) {
-        $name = $tx->product_name;
-        $produkCounts[$name] = ($produkCounts[$name] ?? 0) + 1;
+        $key = $tx->product_id . '|' . $tx->product_type; // unik per tipe
+        $produkCounts[$key] = ($produkCounts[$key] ?? 0) + 1;
     }
 
-    // Sort descending by freq
+    // Urut descending by freq
     arsort($produkCounts);
 
-    // Ambil 5 besar
-    $recommendations = array_slice(array_keys($produkCounts), 0, 5);
+    // Ambil 10 besar
+    $topKeys = array_slice(array_keys($produkCounts), 0, 10);
+
+    // Pecah kembali jadi array id + type
+    $recommendations = [];
+    foreach ($topKeys as $key) {
+        [$id, $type] = explode('|', $key);
+        $recommendations[] = [
+            'product_id' => (int) $id,
+            'product_type' => $type
+        ];
+    }
 
     return response()->json([
         'recommendations' => $recommendations,
         'total_matches' => $histories->count()
     ]);
 }
+
+
 
 
 

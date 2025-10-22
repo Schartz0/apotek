@@ -22,7 +22,14 @@ class MedController extends Controller
         // Jika akses via web (Blade)
         return view('pages.produk_med', compact('meds'));
     }
-
+    public function show(Med $med)
+    {
+        return response()->json([
+            'id'    => $med->id,
+            'name'  => $med->name,
+            'price' => $med->price,
+        ]);
+    }
     /**
      * Simpan data obat baru
      */

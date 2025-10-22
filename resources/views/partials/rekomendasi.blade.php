@@ -1,3 +1,4 @@
+{{-- resources/views/partials/rekomendasi.blade.php --}}
 <div class="col-rekomendasi">
   <h5>💡 Rekomendasi Produk</h5>
 
@@ -14,36 +15,36 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
+  const rekomList    = document.getElementById('rekom-list');
+  const rekomLoading = document.getElementById('rekom-loading');
+  const btnRefresh   = document.getElementById('btn-refresh-rekom');
 
-  const rekomList   = document.getElementById('rekom-list');
-  const rekomLoading= document.getElementById('rekom-loading');
-  const btnRefresh  = document.getElementById('btn-refresh-rekom');
-
-  // ——— UTIL: ambil wrapper tab aktif ———
   function getActiveTabWrapper(){
     return document.querySelector('.tab-content.active') || document.querySelector('.tab-content');
   }
 
-  // ——— FUNGSI UTAMA: ambil rekom berdasarkan tab aktif ———
+  // ——— DEBOUNCE UTILITY ———
+  function debounce(fn, delay){
+    let timer;
+    return function(...args){
+      clearTimeout(timer);
+      timer = setTimeout(()=> fn.apply(this, args), delay);
+    }
+  }
+
+  // ——— FUNGSI UTAMA AMBIL REKOMENDASI ———
   async function ambilRekomendasi() {
     const w = getActiveTabWrapper();
-    if (!w) return;
+    if(!w) return;
 
     const age        = (w.querySelector('.age')?.value || '').trim();
     const sex        = (w.querySelector('.sex')?.value || '').trim();
     const occupation = (w.querySelector('.occupation')?.value || '').trim();
 
-    // Jika belum ada data penting, jangan fetch
-    if (!age && !sex && !occupation) {
+    if(!age && !sex && !occupation){
       rekomList.innerHTML = '<li class="text-muted">Isi data klien untuk melihat rekomendasi.</li>';
       return;
     }
-
-    const client = {
-      age: age || null,
-      sex: sex || null,
-      occupation: occupation || null,
-    };
 
     rekomLoading.classList.remove('hidden');
     rekomList.innerHTML = '';
@@ -55,24 +56,49 @@ document.addEventListener('DOMContentLoaded', ()=>{
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        body: JSON.stringify(client)
+        body: JSON.stringify({ age: age || null, sex: sex || null, occupation: occupation || null })
       });
 
       const data = await res.json();
       rekomList.innerHTML = '';
 
-      if (data.recommendations && data.recommendations.length > 0) {
-        data.recommendations.forEach(r => {
+      if(data.recommendations && data.recommendations.length > 0){
+        data.recommendations.forEach(r=>{
           const li = document.createElement('li');
-          // dukung kedua bentuk: string atau object {product_name}
-          li.textContent = typeof r === 'string' ? r : (r.product_name ?? r.name ?? '-');
+          li.classList.add('cursor-pointer', 'hover:text-blue-600');
+          li.textContent = r.name || '-';
+          li.dataset.id    = r.id;
+          li.dataset.type  = r.type;
+          li.dataset.price = r.price;
+
+          // klik masuk ke input produk
+          li.addEventListener('click', ()=>{
+            const inputWrapper = getActiveTabWrapper();
+            inputWrapper.querySelector('.product-search').value  = r.name;
+            inputWrapper.querySelector('.product_id').value      = r.id;
+            inputWrapper.querySelector('.product_type').value    = r.type;
+            inputWrapper.querySelector('.price').value           = r.price;
+
+            const dateEl = inputWrapper.querySelector('.scheduled_date');
+            const timeEl = inputWrapper.querySelector('.scheduled_time');
+
+            if(r.type === 'service'){
+              dateEl.removeAttribute('disabled');
+              timeEl.removeAttribute('disabled');
+            } else { // med
+              dateEl.value = '';
+              timeEl.value = '';
+              dateEl.setAttribute('disabled','disabled');
+              timeEl.setAttribute('disabled','disabled');
+            }
+          });
+
           rekomList.appendChild(li);
         });
       } else {
         rekomList.innerHTML = '<li class="text-muted">Tidak ada rekomendasi ditemukan.</li>';
       }
-
-    } catch (err) {
+    } catch(err){
       console.error(err);
       rekomList.innerHTML = '<li class="text-danger">Gagal mengambil rekomendasi.</li>';
     } finally {
@@ -80,47 +106,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   }
 
-  // ——— EKSPOR KE GLOBAL: bisa dipanggil dari file lain ———
-  window.refreshRekom = ambilRekomendasi;
+  // wrap ambilRekomendasi dengan debounce
+  const ambilDebounce = debounce(ambilRekomendasi, 400);
 
-  // ——— Refresh manual via tombol ———
+  // ——— EVENT LISTENER ———
   btnRefresh.addEventListener('click', ambilRekomendasi);
 
-  // ——— Auto-refresh saat user mengubah demografi di TAB AKTIF ———
-  document.addEventListener('input', (e)=>{
+  document.addEventListener('input', e=>{
     if(!e.target.closest('.tab-content.active')) return;
-    if (e.target.classList.contains('age') ||
-        e.target.classList.contains('sex') ||
-        e.target.classList.contains('occupation')) {
-      ambilRekomendasi();
+    if(['age','sex','occupation'].some(cls=>e.target.classList.contains(cls))){
+      ambilDebounce();
     }
   });
-  document.addEventListener('change', (e)=>{
+
+  document.addEventListener('change', e=>{
     if(!e.target.closest('.tab-content.active')) return;
-    if (e.target.classList.contains('age') ||
-        e.target.classList.contains('sex') ||
-        e.target.classList.contains('occupation')) {
-      ambilRekomendasi();
+    if(['age','sex','occupation'].some(cls=>e.target.classList.contains(cls))){
+      ambilDebounce();
     }
   });
 
-  // ——— Auto-refresh setelah klik “Tambah ke Ringkasan” dari tab mana pun (event delegation) ———
-  document.addEventListener('click', (e)=>{
-    if (e.target.classList.contains('btn-tambah-ke-ringkasan')) {
-      // biarkan proses tambah jalan dulu, lalu refresh
-      setTimeout(ambilRekomendasi, 0);
-    }
-  });
-
-  // ——— Auto-refresh saat user pindah tab ———
-  document.getElementById('tab-container')?.addEventListener('click', (e)=>{
-    if (e.target.classList.contains('tab')) {
-      // beri jeda tipis agar class .active sudah pindah
-      setTimeout(ambilRekomendasi, 0);
-    }
-  });
-
-  // panggil awal (kalau sudah ada nilai)
+  // panggil pertama kali kalau sudah ada nilai
   ambilRekomendasi();
 });
 </script>

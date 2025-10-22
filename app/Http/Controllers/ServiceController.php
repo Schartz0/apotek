@@ -23,6 +23,16 @@ class ServiceController extends Controller
         return view('pages.produk_service', compact('services'));
     }
 
+    public function show(Service $service)
+    {
+    return response()->json([
+        'id'       => $service->id,
+        'name'     => $service->name,
+        'price'    => $service->price,
+        'duration' => $service->duration,
+    ]);
+    }
+
     /**
      * Simpan data service baru
      */
