@@ -185,48 +185,83 @@ public function destroyByRef(string $ref_no)
 
 public function recommend(Request $request)
 {
-    $age = $request->age;
-    $sex = $request->sex;
-    $occupation = $request->occupation;
+    $age        = $request->filled('age') ? (int)$request->age : null;
+    $sex        = $request->sex ?: null;
+    $occupation = $request->occupation ? trim($request->occupation) : null;
+    $limit      = 10; // top-N yang kamu mau
 
-    // Ambil transaksi lama yang mirip (cluster by usia, sex, pekerjaan)
-    $query = Transaction::query();
-    if ($age) $query->whereBetween('age', [$age - 5, $age + 5]);
-    if ($sex) $query->where('sex', $sex);
-    if ($occupation) $query->where('occupation', 'like', "%$occupation%");
+    // helper build query dengan opsi pelonggaran
+    $build = function(bool $useAge, int $ageRange, bool $useSex, bool $useOcc) use ($age,$sex,$occupation) {
+        $q = Transaction::query();
 
-    $histories = $query->get();
+        if ($useSex && $sex) {
+            $q->where('sex', $sex);
+        }
 
-    // Hitung frekuensi berdasarkan product_id + product_type
-    $produkCounts = [];
-    foreach ($histories as $tx) {
-        $key = $tx->product_id . '|' . $tx->product_type; // unik per tipe
-        $produkCounts[$key] = ($produkCounts[$key] ?? 0) + 1;
+        if ($useAge && $age !== null) {
+            $min = max(0, $age - $ageRange);
+            $max = min(120, $age + $ageRange);
+            // Sertakan age NULL supaya data lama tidak “hilang total” saat filter usia aktif
+            $q->where(function($w) use ($min,$max) {
+                $w->whereBetween('age', [$min,$max])
+                  ->orWhereNull('age');
+            });
+        }
+
+        if ($useOcc && $occupation) {
+            // case-insensitive dan trimming
+            $q->whereRaw('LOWER(TRIM(occupation)) LIKE ?', ['%'.strtolower($occupation).'%']);
+        }
+
+        return $q;
+    };
+
+    // ===== Progressive backoff =====
+    // 1) ketat: age±5 + sex + occupation
+    $candidates = $build(true, 5, true, true)->get(['product_id','product_type']);
+    // 2) longgarkan usia (±10), tetap sex, drop occ jika perlu
+    if ($candidates->isEmpty()) $candidates = $build(true,10, true, true)->get(['product_id','product_type']);
+    if ($candidates->isEmpty()) $candidates = $build(true,10, true, false)->get(['product_id','product_type']);
+    // 3) hanya sex
+    if ($candidates->isEmpty()) $candidates = $build(false,0, true, false)->get(['product_id','product_type']);
+    // 4) hanya occupation
+    if ($candidates->isEmpty()) $candidates = $build(false,0, false, true)->get(['product_id','product_type']);
+    // 5) trending global (fallback)
+    $fallbackUsed = false;
+    if ($candidates->isEmpty()) {
+        $fallbackUsed = true;
+        $candidates = Transaction::query()
+            ->latest('created_at')
+            ->limit(1000) // batasi scan
+            ->get(['product_id','product_type']);
     }
 
-    // Urut descending by freq
-    arsort($produkCounts);
+    // Hitung frekuensi per (product_id, product_type)
+    $counts = [];
+    foreach ($candidates as $tx) {
+        if (!$tx->product_id || !$tx->product_type) continue;
+        $key = $tx->product_id . '|' . $tx->product_type;
+        $counts[$key] = ($counts[$key] ?? 0) + 1;
+    }
+    arsort($counts);
 
-    // Ambil 10 besar
-    $topKeys = array_slice(array_keys($produkCounts), 0, 10);
-
-    // Pecah kembali jadi array id + type
+    // Ambil Top-N dan map ke bentuk FE
+    $topKeys = array_slice(array_keys($counts), 0, $limit);
     $recommendations = [];
     foreach ($topKeys as $key) {
-        [$id, $type] = explode('|', $key);
+        [$pid, $ptype] = explode('|', $key);
         $recommendations[] = [
-            'product_id' => (int) $id,
-            'product_type' => $type
+            'product_id'   => (int)$pid,
+            'product_type' => $ptype,
         ];
     }
 
     return response()->json([
         'recommendations' => $recommendations,
-        'total_matches' => $histories->count()
+        'total_matches'   => array_sum(array_intersect_key($counts, array_flip($topKeys))) ?: $candidates->count(),
+        'fallback_used'   => $fallbackUsed,
     ]);
 }
-
-
 
 
 
