@@ -24,7 +24,7 @@
             <div class="grid-2">
               <div class="form-row">
                 <label>Ref No</label>
-                <input type="text" class="input ref_no" placeholder="TX-XXXXXX (auto)" readonly>
+                <input type="text" class="input ref_no" placeholder="TX-XXXXXX (readonly)" readonly>
               </div>
               <div class="form-row">
                 <label>Created By</label>
@@ -75,7 +75,7 @@
               </div>
               <div class="grid-2">
                 <div class="form-row">
-                  <label>Price (Rp)</label>
+                  <label>Price (Rupiah)</label>
                   <input type="number" class="input price" min="0" placeholder="Otomatis" readonly>
                 </div>
                 <div class="form-row">
@@ -486,12 +486,34 @@ document.getElementById('btn-proses').addEventListener('click', async ()=>{
 </script>
 
 <style>
-/* Layout 3/4 vs 1/4 */
-.layout-34{display:flex; gap:20px; align-items:flex-start;}
-.col-transaksi{flex:0 0 75%;}
-.col-rekomendasi{flex:0 0 23%; background:#fafafa; padding:15px; border:1px solid #e5e5e5; border-radius:6px;}
-.col-rekomendasi h5{margin-top:0;}
+.buat-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* bantu atur posisi umum */
+  padding: 30px 0;
+}
 
+/* Tambah offset dari kiri supaya agak ke tengah */
+.layout-34 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px; /* batasi lebar agar tidak melebar seluruh layar */
+  margin-left: 140px; /* inilah yang bikin agak ke tengah */
+}
+
+.col-transaksi {
+  flex: 0 0 75%;
+}
+
+.col-rekomendasi {
+  flex: 0 0 23%;
+  background: #fafafa;
+  padding: 15px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+}
 /* Tab */
 .tab-bar{display:flex; justify-content:space-between; margin-bottom:15px;}
 .tabs{display:flex; gap:6px; flex-wrap:wrap;}
@@ -512,5 +534,10 @@ document.getElementById('btn-proses').addEventListener('click', async ()=>{
 .table .tar{text-align:right}
 .table .strong{font-weight:600}
 .muted{color:#888}
+@media (min-width: 1200px) {
+  .layout-34 {
+    margin-left: 12%; /* geser kanan secara proporsional */
+  }
+}
 </style>
 @endsection
